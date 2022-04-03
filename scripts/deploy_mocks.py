@@ -1,6 +1,6 @@
 from scripts.helpful_scripts import deploy_mocks
 
-DECIMALS = 18
+DECIMALS = 8
 INITIAL_VALUE = 2000
 
 

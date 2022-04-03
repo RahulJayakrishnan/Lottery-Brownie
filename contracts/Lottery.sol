@@ -5,16 +5,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./PriceFeedConsumer.sol";
 import "./VRFConsumer.sol";
 
-contract Lottery is Ownable, PriceFeedConsumer, VRFConsumer{
+contract Lottery is Ownable, PriceFeedConsumer, VRFConsumer {
 
     enum LotteryStatus {Ended, Open, PickingWinner}
     LotteryStatus public status;
+
     event RequestedWithId(bytes32 requestId);
 
     address payable[] public players;
     address payable public recentWinner;
     uint256 public recentRandom;
-    uint64 public entryFeeUSD = 50;
+    int256 public entryFeeUSD = 50;
 
 
     constructor(address _priceFeedAddress,
@@ -27,14 +28,14 @@ contract Lottery is Ownable, PriceFeedConsumer, VRFConsumer{
         status = LotteryStatus.Ended;
     }
 
-    function getLotteryPriceInWei() public view returns (int) {
+    function getLotteryPriceInWei() public view returns (uint256) {
         int _price_per_eth = getLatestPrice();
-        return 1e18*entryFeeUSD*1e8/_price_per_eth;
+        return uint256(1e18 * entryFeeUSD * 1e8 / _price_per_eth);
     }
 
     function enter() public payable {
         require(status == LotteryStatus.Open);
-        require(msg.value >= uint256(getLotteryPriceInWei()));
+        require(msg.value >= getLotteryPriceInWei());
         players.push(payable(msg.sender));
     }
 
